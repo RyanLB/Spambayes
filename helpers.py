@@ -14,7 +14,20 @@ def conditional_probabilities(targets, means, standard_deviations):
   ns = map(lambda (x, y, z) : bigN(x, y, z), zip(targets, means, standard_deviations))
   return sum(np.log(ns))
 
-def class_probabilities(training_set, targets):
+def class_probabilities(stats, targets):
+  pos_conditional_prob = math.log(stats['pos_prob']) + conditional_probabilities(targets,
+                                                                                stats['pos_means'],
+                                                                                stats['pos_stdevs'])
+  neg_conditional_prob = math.log(stats['neg_prob']) + conditional_probabilities(targets,
+                                                                                 stats['neg_means'],
+                                                                                 stats['neg_stdevs'])
+
+  return {
+    "positive": pos_conditional_prob,
+    "negative": neg_conditional_prob
+  }
+
+def class_statistics(training_set):
   positives = map(lambda x : x[:-1], filter(positive_filter, training_set))
   negatives = map(lambda x : x[:-1], filter(negative_filter, training_set))
 
@@ -27,14 +40,14 @@ def class_probabilities(training_set, targets):
   pos_stdevs = np.std(positives, axis=0)
   neg_stdevs = np.std(negatives, axis=0)
 
-  pos_conditional_prob = math.log(pos_prob) + conditional_probabilities(targets, pos_means, pos_stdevs)
-  neg_conditional_prob = math.log(neg_prob) + conditional_probabilities(targets, neg_means, neg_stdevs)
-
   return {
-    "positive": pos_conditional_prob,
-    "negative": neg_conditional_prob
+    "pos_prob": pos_prob,
+    "neg_prob": neg_prob,
+    "pos_means": pos_means,
+    "neg_means": neg_means,
+    "pos_stdevs": pos_stdevs,
+    "neg_stdevs": neg_stdevs
   }
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Everything from here down is just data processing stuff.                  #
