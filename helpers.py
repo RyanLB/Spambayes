@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import math
 
 DATA_LOCATION = "spambase/spambase.data"
@@ -27,6 +28,18 @@ def class_probabilities(stats, targets):
     "negative": neg_conditional_prob
   }
 
+def classify(stats, example):
+  probs = class_probabilities(stats, example[:-1])
+
+  if probs['positive'] > probs['negative']:
+    return 1.0
+
+  if probs['positive'] < probs['negative']:
+    return 0.0
+
+  # Flip a coin
+  return float(random.randint(0, 1))
+
 def class_statistics(training_set):
   positives = map(lambda x : x[:-1], filter(positive_filter, training_set))
   negatives = map(lambda x : x[:-1], filter(negative_filter, training_set))
@@ -48,6 +61,18 @@ def class_statistics(training_set):
     "pos_stdevs": pos_stdevs,
     "neg_stdevs": neg_stdevs
   }
+
+def true_positives(ecs):
+  return len(filter(lambda (ex, res) : positive_filter(ex) and res == ex[-1], ecs))
+
+def true_negatives(ecs):
+  return len(filter(lambda (ex, res) : negative_filter(ex) and res == ex[-1], ecs))
+
+def false_positives(ecs):
+  return len(filter(lambda (ex, res) : positive_filter(ex) and res != ex[-1], ecs))
+
+def false_negatives(ecs):
+  return len(filter(lambda (ex, res) : negative_filter(ex) and res != ex[-1], ecs))
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Everything from here down is just data processing stuff.                  #

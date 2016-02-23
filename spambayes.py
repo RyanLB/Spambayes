@@ -3,10 +3,18 @@ import numpy as np
 
 datasets = h.create_datasets(h.load_data())
 
-positive_probability = float(len(filter(h.positive_filter, datasets['training']))) / len(datasets['training'])
-negative_probability = float(len(filter(h.negative_filter, datasets['training']))) / len(datasets['training'])
+training_statistics = h.class_statistics(datasets['training'])
 
-means = np.mean(datasets['training'], axis=0)
-standard_deviations = np.stdev(datasets['training'], axis=0)
+results = zip(datasets['test'], map(lambda x : h.classify(training_statistics, x), datasets['test']))
 
+tp = h.true_positives(results)
+tn = h.true_negatives(results)
+fp = h.false_positives(results)
+fn = h.false_negatives(results)
 
+print "True positives:", tp
+print "True negatives:", tn
+print "False positives:", fp
+print "False negatives:", fn
+
+print "Accuracy:", float(tp + tn) / len(datasets['test'])
