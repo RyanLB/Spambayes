@@ -18,3 +18,5 @@ print "False positives:", fp
 print "False negatives:", fn
 
 print "Accuracy:", float(tp + tn) / len(datasets['test'])
+print "Precision:", float(tp) / (tp + fp)
+print "Recall:", float(tp) / (tp + fn)
